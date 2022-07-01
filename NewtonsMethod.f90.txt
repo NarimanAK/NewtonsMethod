@@ -1,0 +1,63 @@
+module NewtonsMethod
+	implicit none
+	real, parameter :: Epsilon = 0.0001
+	integer :: Max_Itns = 100
+
+	contains
+		complex function f(x)
+			implicit none
+			complex, intent(in) :: x
+			f = x**5 - 1
+		end function f
+
+		complex function p(x)
+			implicit none
+			complex, intent(in) :: x
+			p = 5*x**4
+		end function p
+
+		complex function x_new(x)
+			implicit none
+			complex, intent(in) :: x
+			x_new = f(x)/p(x)
+		end function x_new
+
+		integer function converge(x)
+			implicit none
+			complex :: x
+			real, parameter :: Epsilon = 0.0001
+			complex :: x0, xn
+			integer :: j = 0
+			integer, parameter :: Max_Itns = 100
+
+			x0 = x
+			xn = x - x_new(x)
+			
+			do j = 0, Max_Itns
+				if(ABS(xn-x0) >= Epsilon) then
+					x0 = xn
+					xn = x0 - x_new(x0)
+				else
+					exit
+				end if
+			end do
+			
+			converge = j
+			j = 0
+		end function converge
+end module NewtonsMethod
+
+program main
+	use NewtonsMethod
+	implicit none
+	integer :: k,l,i
+	complex :: z
+	real :: c,d
+
+		do c = -2,2,0.01
+			do d = -2,2,0.01
+				z = cmplx(c,d)
+				print *, c, ",", d,",", converge(z)
+			end do
+		end do
+end program main
